@@ -1,0 +1,69 @@
+
+vEOS-02#show running-config
+! Command: show running-config
+! device: vEOS-02 (vEOS-lab, EOS-4.30.0F)
+!
+! boot system flash:/vEOS-lab.swi
+!
+no aaa root
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model ribd
+!
+hostname vEOS-02
+!
+spanning-tree mode mstp
+!
+system l1
+   unsupported speed action error
+   unsupported error-correction action error
+!
+vlan 10
+   name CLIENTI_VXLAN
+!
+interface Ethernet1
+   description LINK_TO_ISP_e0/1
+   no switchport
+   ip address 198.51.100.2/30
+   ip ospf area 0.0.0.0
+!
+interface Ethernet2
+   description TRUNK_TO_SW-02_e0/0
+   switchport trunk allowed vlan 10
+   switchport mode trunk
+!
+interface Ethernet3
+!
+interface Ethernet4
+!
+interface Ethernet5
+!
+interface Ethernet6
+!
+interface Ethernet7
+!
+interface Ethernet8
+!
+interface Loopback0
+   description VTEP_SOURCE_IP
+   ip address 10.0.0.2/32
+   ip ospf area 0.0.0.0
+!
+interface Management1
+!
+interface Vxlan1
+   vxlan source-interface Loopback0
+   vxlan udp-port 4789
+   vxlan vlan 10 vni 10010
+   vxlan flood vtep 10.0.0.1
+!
+ip routing
+!
+ip route 0.0.0.0/0 198.51.100.1
+!
+router ospf 1
+   max-lsa 12000
+!
+end
+vEOS-02#
