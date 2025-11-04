@@ -1,0 +1,23 @@
+graph TD
+    subgraph "Area 0 (Backbone)"
+        R1(R1) --- |"Eth0/1 - Eth0/1"| R2(R2 - ABR)
+        R1(R1) --- |"Eth0/2 - Eth0/1"| R3(R3)
+        R3(R3) --- |"Eth0/2 - Eth0/2"| R2(R2 - ABR)
+    end
+
+    subgraph "Area 1 (Uffici)"
+        R2(R2 - ABR) --- |"Eth0/3 - Eth0/1"| R4(R4)
+        R4(R4) --- |"Eth0/2 - Eth0/1"| R5(R5)
+        R4(R4) --- |"Eth0/3 - Eth0/1"| R6(R6)
+        R5(R5) --- |"Eth0/2 - Eth0/2"| R6(R6)
+    end
+
+    subgraph "Area 2 (Data Center)"
+        R2(R2 - ABR) --- |"Eth0/0 - Eth0/1"| R7(R7)
+        R7(R7) --- |"Eth0/2 - Eth0/1"| R8(R8)
+        R7(R7) --- |"Eth0/3 - Eth0/1"| R9(R9)
+        R8(R8) --- |"Eth0/2 - Eth0/2"| R9(R9)
+    end
+
+    %% Stile per evidenziare l'ABR
+    style R2 fill:#f9d,stroke:#333,stroke-width:2px
