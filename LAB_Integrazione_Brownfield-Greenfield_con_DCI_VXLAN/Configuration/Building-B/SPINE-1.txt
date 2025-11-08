@@ -1,0 +1,151 @@
+
+SPINE-1#sh ru
+% Ambiguous command:  "sh ru"
+SPINE-1#show run
+Building configuration...
+
+Current configuration : 1604 bytes
+!
+! Last configuration change at 10:11:06 UTC Sat Nov 8 2025
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SPINE-1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+no cdp log mismatch duplex
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 169.254.2.2 255.255.255.255
+ ip ospf 1 area 0
+!
+interface Ethernet0/0
+ ip address 10.100.0.1 255.255.255.0
+ ip ospf 1 area 0
+!
+interface Ethernet0/1
+ no ip address
+!
+interface Ethernet0/2
+ no ip address
+!
+interface Ethernet0/3
+ no ip address
+!
+interface Ethernet1/0
+ description LINK-TO-LEAF-1_e1/0
+ ip address 10.254.11.1 255.255.255.252
+ ip ospf 1 area 0
+ ospfv3 network point-to-point
+!
+interface Ethernet1/1
+ description LINK-TO-LEAF-2_e1/1
+ ip address 10.254.12.1 255.255.255.252
+ ip ospf 1 area 0
+ ospfv3 network point-to-point
+!
+interface Ethernet1/2
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
+ no ip address
+ shutdown
+!
+router ospf 1
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 10.100.0.254
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ login
+ transport input none
+!
+!
+end
+
+SPINE-1# wr me
+Building configuration...
+[OK]
+SPINE-1#

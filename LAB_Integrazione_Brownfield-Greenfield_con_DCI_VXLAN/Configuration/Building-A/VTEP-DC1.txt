@@ -1,0 +1,76 @@
+
+VTEP-DC1#SHOW RUN
+! Command: show running-config
+! device: VTEP-DC1 (vEOS-lab, EOS-4.30.0F)
+!
+! boot system flash:/vEOS-lab.swi
+!
+no aaa root
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model ribd
+!
+hostname VTEP-DC1
+!
+spanning-tree mode mstp
+!
+system l1
+   unsupported speed action error
+   unsupported error-correction action error
+!
+vlan 100
+   name DCI-VLAN
+!
+interface Ethernet1
+   description LINK-TO-R9_e0/0
+   no switchport
+   ip address 10.2.9.2/30
+!
+interface Ethernet2
+   description LINK-TO-R8_e0/0
+   no switchport
+   ip address 10.2.8.2/30
+!
+interface Ethernet3
+   description LINK-TO-HOST-A
+   switchport access vlan 100
+!
+interface Ethernet4
+!
+interface Ethernet5
+!
+interface Ethernet6
+!
+interface Ethernet7
+!
+interface Ethernet8
+!
+interface Loopback1
+   description VXLAN-VTEP-Source & OSPF-Router-ID
+   ip address 192.168.110.1/32
+!
+interface Management1
+!
+interface Vlan100
+   description Anycast-GW-VLAN100
+   ip address 192.168.100.1/24
+!
+interface Vxlan1
+   description VXLAN-DCI-Tunnel
+   vxlan source-interface Loopback1
+   vxlan udp-port 4789
+   vxlan vlan 100 vni 10100
+   vxlan vlan 100 flood vtep 192.168.110.2
+!
+ip routing
+!
+router ospf 1
+   router-id 192.168.110.1
+   network 10.2.8.0/30 area 0.0.0.2
+   network 10.2.9.0/30 area 0.0.0.2
+   network 192.168.110.1/32 area 0.0.0.2
+   max-lsa 12000
+!
+end
+VTEP-DC1#
