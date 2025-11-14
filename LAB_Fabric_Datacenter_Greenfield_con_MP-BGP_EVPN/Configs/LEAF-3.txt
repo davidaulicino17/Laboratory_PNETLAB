@@ -1,0 +1,83 @@
+! Prima di tutto, esegui:
+! enable
+! zerotouch disable
+! write
+! reload
+
+enable
+configure terminal
+
+hostname Leaf-3
+no aaa root
+
+! Configurazione Globale
+system mtu 9214
+ip routing
+
+! Interfacce Underlay (OSPF)
+interface Loopback0
+   ip address 1.1.1.13/32
+   
+interface Ethernet1
+   description Link-to-Spine-1
+   no switchport
+   mtu 9000
+   ip address 10.0.3.1/31
+   ip ospf network point-to-point
+
+interface Ethernet2
+   description Link-to-Spine-2
+   no switchport
+   mtu 9000
+   ip address 10.0.7.1/31
+   ip ospf network point-to-point
+
+! Interfaccia Access (Host)
+interface Ethernet5
+   description Link-to-Server-2.1
+   switchport
+   switchport access vlan 20
+
+! Routing Underlay (OSPF)
+router ospf 1
+   router-id 1.1.1.13
+   network 1.1.1.0/24 area 0.0.0.0
+   network 10.0.0.0/16 area 0.0.0.0
+
+! Configurazione VXLAN
+interface Vxlan1
+   description VTEP Interface
+   vxlan source-interface Loopback0
+   vxlan udp-port 4789
+   vxlan vrf TENANT_ROSSO vni 50001
+
+! Configurazione Tenant (L3VNI + DAG)
+vrf definition TENANT_ROSSO
+!
+vlan 20
+   name TENANT_ROSSO
+   
+interface Vlan20
+   description DAG Tenant ROSSO
+   vrf forwarding TENANT_ROSSO
+   ip address virtual 192.168.20.1/24
+
+! Routing Overlay (BGP Client)
+router bgp 65000
+   router-id 1.1.1.13
+   neighbor SPINE_PEER_GROUP peer group
+   neighbor SPINE_PEER_GROUP remote-as 65000
+   neighbor SPINE_PEER_GROUP update-source Loopback0
+   neighbor 1.1.1.1 peer group SPINE_PEER_GROUP
+   neighbor 1.1.1.2 peer group SPINE_PEER_GROUP
+   !
+   address-family evpn
+      neighbor SPINE_PEER_GROUP activate
+   !
+   vrf TENANT_ROSSO
+      rd auto
+      route-target both 50001:50001
+      redistribute connected
+
+end
+write

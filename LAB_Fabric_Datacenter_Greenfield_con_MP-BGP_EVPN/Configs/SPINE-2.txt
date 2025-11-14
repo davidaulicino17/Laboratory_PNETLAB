@@ -1,0 +1,71 @@
+! Prima di tutto, esegui:
+! enable
+! zerotouch disable
+! write
+! reload
+
+enable
+configure terminal
+
+hostname Spine-2
+no aaa root
+
+! Configurazione Globale
+system mtu 9214
+ip routing
+
+! Interfacce Underlay (OSPF)
+interface Loopback0
+   ip address 1.1.1.2/32
+   
+interface Ethernet1
+   description Link-to-Leaf-1
+   no switchport
+   mtu 9000
+   ip address 10.0.5.0/31
+   ip ospf network point-to-point
+
+interface Ethernet2
+   description Link-to-Leaf-2
+   no switchport
+   mtu 9000
+   ip address 10.0.6.0/31
+   ip ospf network point-to-point
+
+interface Ethernet3
+   description Link-to-Leaf-3
+   no switchport
+   mtu 9000
+   ip address 10.0.7.0/31
+   ip ospf network point-to-point
+
+interface Ethernet4
+   description Link-to-Leaf-4
+   no switchport
+   mtu 9000
+   ip address 10.0.8.0/31
+   ip ospf network point-to-point
+
+! Routing Underlay (OSPF)
+router ospf 1
+   router-id 1.1.1.2
+   network 1.1.1.0/24 area 0.0.0.0
+   network 10.0.0.0/16 area 0.0.0.0
+
+! Routing Overlay (BGP RR)
+router bgp 65000
+   router-id 1.1.1.2
+   neighbor LEAF_PEER_GROUP peer group
+   neighbor LEAF_PEER_GROUP remote-as 65000
+   neighbor LEAF_PEER_GROUP update-source Loopback0
+   neighbor LEAF_PEER_GROUP route-reflector-client
+   neighbor 1.1.1.11 peer group LEAF_PEER_GROUP
+   neighbor 1.1.1.12 peer group LEAF_PEER_GROUP
+   neighbor 1.1.1.13 peer group LEAF_PEER_GROUP
+   neighbor 1.1.1.14 peer group LEAF_PEER_GROUP
+   !
+   address-family evpn
+      neighbor LEAF_PEER_GROUP activate
+
+end
+write
