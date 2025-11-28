@@ -1,0 +1,116 @@
+
+SW-AUTH#sh ru
+Building configuration...
+
+Current configuration : 1344 bytes
+!
+! Last configuration change at 12:43:52 UTC Fri Nov 28 2025
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+service compress-config
+!
+hostname SW-AUTH
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+username admin privilege 15 secret 5 $1$bf46$3eGlR8M/2X5QiCNrlLTvo/
+aaa new-model
+!
+!
+aaa group server radius RADIUS-GROUP
+ server name NPS
+!
+aaa authentication login LOGIN_SSH group radius local
+!
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+!
+!
+no ip icmp rate-limit unreachable
+!
+!
+!
+no ip domain-lookup
+ip domain-name lab.local
+ip cef
+no ipv6 cef
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+ip tcp synwait-time 5
+ip ssh version 2
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+!
+interface Ethernet0/1
+!
+interface Ethernet0/2
+!
+interface Ethernet0/3
+!
+interface Vlan1
+ ip address 192.168.1.254 255.255.255.0
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+!
+!
+!
+radius server NPS
+ address ipv4 192.168.1.10 auth-port 1812 acct-port 1813
+ key Cisco123
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ login authentication LOGIN_SSH
+ transport input ssh
+!
+!
+end
+
+SW-AUTH#
