@@ -1,0 +1,48 @@
+! Configurazione Base R2 (Core)
+enable
+configure terminal
+
+! ---------------------------------------------------------
+! 1. Hostname e Disabilitazione DNS
+! ---------------------------------------------------------
+hostname R2
+no ip domain-lookup
+
+! ---------------------------------------------------------
+! 2. Configurazione Enable Mode
+! ---------------------------------------------------------
+enable secret cisco
+
+! ---------------------------------------------------------
+! 3. Configurazione Interfacce
+! ---------------------------------------------------------
+
+! Loopback
+interface Loopback0
+ description Router_ID_Loopback
+ ip address 2.2.2.2 255.255.255.255
+ exit
+
+! Verso R3 (OSPF)
+interface Ethernet0/0
+ description Link_Verso_R3_OSPF
+ ip address 10.1.23.2 255.255.255.0
+ no shutdown
+ exit
+
+! Verso R4 (EIGRP)
+interface Ethernet0/1
+ description Link_Verso_R4_EIGRP
+ ip address 10.1.24.2 255.255.255.0
+ no shutdown
+ exit
+
+! Verso R1 (Backdoor)
+interface Ethernet0/3
+ description Link_Verso_R1_Backdoor
+ ip address 10.1.12.2 255.255.255.0
+ no shutdown
+ exit
+
+end
+write memory

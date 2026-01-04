@@ -1,0 +1,41 @@
+! Configurazione Base R3 (Internal OSPF)
+enable
+configure terminal
+
+! ---------------------------------------------------------
+! 1. Hostname e Disabilitazione DNS
+! ---------------------------------------------------------
+hostname R3
+no ip domain-lookup
+
+! ---------------------------------------------------------
+! 2. Configurazione Enable Mode
+! ---------------------------------------------------------
+enable secret cisco
+
+! ---------------------------------------------------------
+! 3. Configurazione Interfacce
+! ---------------------------------------------------------
+
+! Loopback
+interface Loopback0
+ description Router_ID_Loopback
+ ip address 3.3.3.3 255.255.255.255
+ exit
+
+! Verso R1
+interface Ethernet0/0
+ description Link_Verso_R1_Core
+ ip address 10.1.13.3 255.255.255.0
+ no shutdown
+ exit
+
+! Verso R2
+interface Ethernet0/1
+ description Link_Verso_R2_Core
+ ip address 10.1.23.3 255.255.255.0
+ no shutdown
+ exit
+
+end
+write memory

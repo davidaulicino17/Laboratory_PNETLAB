@@ -1,0 +1,34 @@
+! Configurazione Base R5 (ISP External)
+enable
+configure terminal
+
+! ---------------------------------------------------------
+! 1. Hostname e Disabilitazione DNS
+! ---------------------------------------------------------
+hostname R5
+no ip domain-lookup
+
+! ---------------------------------------------------------
+! 2. Configurazione Enable Mode
+! ---------------------------------------------------------
+enable secret cisco
+
+! ---------------------------------------------------------
+! 3. Configurazione Interfacce
+! ---------------------------------------------------------
+
+! Loopback
+interface Loopback0
+ description Router_ID_Loopback
+ ip address 5.5.5.5 255.255.255.255
+ exit
+
+! Verso R1 (Link Pubblico) - Subnet /30
+interface Ethernet0/0
+ description Link_Verso_R1_Enterprise
+ ip address 203.0.113.2 255.255.255.252
+ no shutdown
+ exit
+
+end
+write memory
