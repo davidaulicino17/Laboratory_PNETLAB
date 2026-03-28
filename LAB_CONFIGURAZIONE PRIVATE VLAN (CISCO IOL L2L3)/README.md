@@ -65,7 +65,3 @@ Tutti i dispositivi si trovano all'interno della stessa sottorete logica L3 (`10
 2. Effettuare un ping da PC3 verso PC4: **Deve avere successo** (Stessa Community).
 3. Effettuare un ping da PC1 verso PC3: **Deve fallire** (Cross-VLAN).
 4. Effettuare un ping da qualsiasi PC verso 10.0.0.254: **Deve avere successo** (Raggiungibilità del Gateway).
-
-5. ## Network Diagram
-
-(Diagram.png)
