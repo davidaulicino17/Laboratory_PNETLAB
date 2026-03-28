@@ -1,0 +1,14 @@
+! Switch Core / Gateway (Immagine IOL L3 - Router)
+enable
+configure terminal
+hostname Core_L3
+
+! Configurazione interfaccia verso lo switch L2 (Default Gateway)
+interface Ethernet0/0
+ description LINK_TO_ACCESS_L2
+ ip address 10.0.0.254 255.255.255.0
+ no shutdown
+ exit
+
+end
+write memory
