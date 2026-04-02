@@ -1,9 +1,9 @@
-# LAB: Architettura 3-Tier Zero Trust con ACL
+# LAB: Architettura 3-Tier - Macro Segmentazione con ACL
 
 ## Descrizione
-Questo laboratorio pratico dimostra come implementare un'architettura di rete a tre livelli (Web, Application, Database) basata sui principi fondamentali di Zero Trust. Attraverso l'uso di un router centrale (R-CORE) che funge da gateway per i tre segmenti isolati, vengono applicate rigorose Access Control List (ACL) per imporre un approccio "default deny".
+Questo laboratorio pratico dimostra come implementare un'architettura di rete a tre livelli (Web, Application, Database) applicando i principi di macro-segmentazione e *least privilege*. Attraverso l'uso di un router centrale (R-CORE) che funge da gateway per i tre segmenti isolati, vengono applicate Access Control List (ACL) per limitare il traffico e isolare i domini di failure, riducendo la superficie di attacco complessiva.
 
-Il traffico di rete è strettamente limitato per ridurre la superficie di attacco:
+Il traffico di rete è strettamente regolato:
 - Il livello **Web** può comunicare esclusivamente con il livello **App**.
 - Il livello **App** funge da intermediario e può comunicare sia con il livello **Web** che con il livello **DB**.
 - Il livello **DB** non è autorizzato a iniziare alcuna sessione di rete, ma può unicamente rispondere alle interrogazioni provenienti dal livello **App**.
