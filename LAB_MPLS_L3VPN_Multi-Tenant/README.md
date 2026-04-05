@@ -1,12 +1,7 @@
 # Network Design: MPLS L3VPN Multi-Tenant (OSPF, LDP & MP-BGP)
 
-<<<<<<< HEAD
-> **Autori:** MAX & Blancc
+> **Autore:** David Aulicino
 > **Livello:** Intermedio / Avanzato
-=======
-> **Autori:** David Aulicino  
-> **Livello:** Intermedio / Avanzato  
->>>>>>> db9938ac533717c8eadd35a4dccf2b96740c6868
 > **Simulatore:** EVE-NG / GNS3 con immagini Cisco IOL L3
 
 ---
