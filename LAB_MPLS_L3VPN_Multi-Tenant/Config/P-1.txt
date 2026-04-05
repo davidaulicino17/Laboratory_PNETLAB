@@ -1,0 +1,26 @@
+hostname P-1
+!
+mpls ldp router-id Loopback0 force
+!
+interface Loopback0
+ ip address 10.200.1.1 255.255.255.255
+ ip ospf 1 area 0
+!
+interface Ethernet0/0
+ description TO_PE-1
+ ip address 10.100.1.1 255.255.255.252
+ ip ospf 1 area 0
+ mpls ip
+ no shutdown
+!
+interface Ethernet0/1
+ description TO_PE-2
+ ip address 10.100.2.1 255.255.255.252
+ ip ospf 1 area 0
+ mpls ip
+ no shutdown
+!
+router ospf 1
+ router-id 10.200.1.1
+!
+end

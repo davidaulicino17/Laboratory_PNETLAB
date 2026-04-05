@@ -1,0 +1,23 @@
+# ==========================================
+# Configurazioni Nodi VPCS (Customer Edge)
+# ==========================================
+
+# Configurazione CE-A1 (Cliente A - Roma)
+# Collegato a PE-1 eth0/1
+ip 192.168.10.10/24 192.168.10.254
+save
+
+# Configurazione CE-A2 (Cliente A - Milano)
+# Collegato a PE-2 eth0/1
+ip 192.168.10.20/24 192.168.10.254
+save
+
+# Configurazione CE-B1 (Cliente B - Napoli)
+# Collegato a PE-1 eth0/2
+ip 192.168.10.10/24 192.168.10.254
+save
+
+# Configurazione CE-B2 (Cliente B - Torino)
+# Collegato a PE-2 eth0/2
+ip 192.168.10.20/24 192.168.10.254
+save
