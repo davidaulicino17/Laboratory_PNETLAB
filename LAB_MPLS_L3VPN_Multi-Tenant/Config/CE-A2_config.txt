@@ -1,0 +1,25 @@
+! ============================================================
+!  CE-A2 — Customer Edge Cliente A, Sito Milano
+!  Eth0/0: link verso PE-2 (10.1.3.0/30)
+!  Eth0/1: LAN aziendale Milano (192.168.10.0/24)
+! ============================================================
+
+conf t
+hostname CE-A2
+no ip domain-lookup
+
+interface Ethernet0/0
+ description Link-verso-PE-2
+ ip address 10.1.3.2 255.255.255.252
+ no shutdown
+
+interface Ethernet0/1
+ description LAN-Milano
+ ip address 192.168.10.2 255.255.255.0
+ no shutdown
+
+! Default route verso PE-2
+ip route 0.0.0.0 0.0.0.0 10.1.3.1
+
+end
+wr mem

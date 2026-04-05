@@ -1,0 +1,25 @@
+! ============================================================
+!  CE-B2 — Customer Edge Cliente B, Sito Torino
+!  Eth0/0: link verso PE-2 (10.1.4.0/30)
+!  Eth0/1: LAN aziendale Torino (192.168.10.0/24)
+! ============================================================
+
+conf t
+hostname CE-B2
+no ip domain-lookup
+
+interface Ethernet0/0
+ description Link-verso-PE-2
+ ip address 10.1.4.2 255.255.255.252
+ no shutdown
+
+interface Ethernet0/1
+ description LAN-Torino
+ ip address 192.168.10.2 255.255.255.0
+ no shutdown
+
+! Default route verso PE-2
+ip route 0.0.0.0 0.0.0.0 10.1.4.1
+
+end
+wr mem

@@ -1,0 +1,25 @@
+! ============================================================
+!  CE-A1 — Customer Edge Cliente A, Sito Roma
+!  Eth0/0: link verso PE-1 (10.1.1.0/30)
+!  Eth0/1: LAN aziendale Roma (192.168.10.0/24)
+! ============================================================
+
+conf t
+hostname CE-A1
+no ip domain-lookup
+
+interface Ethernet0/0
+ description Link-verso-PE-1
+ ip address 10.1.1.2 255.255.255.252
+ no shutdown
+
+interface Ethernet0/1
+ description LAN-Roma
+ ip address 192.168.10.1 255.255.255.0
+ no shutdown
+
+! Default route verso PE-1
+ip route 0.0.0.0 0.0.0.0 10.1.1.1
+
+end
+wr mem

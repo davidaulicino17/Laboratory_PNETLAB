@@ -1,7 +1,7 @@
 # Network Design: MPLS L3VPN Multi-Tenant (OSPF, LDP & MP-BGP)
 
-> **Autori:** MAX & Blancc  
-> **Livello:** Intermedio / Avanzato  
+> **Autori:** MAX & Blancc
+> **Livello:** Intermedio / Avanzato
 > **Simulatore:** EVE-NG / GNS3 con immagini Cisco IOL L3
 
 ---
@@ -14,16 +14,14 @@ Questo laboratorio costruisce un'infrastruttura **Service Provider Core** scalab
 
 ## Architettura a Tre Livelli
 
-La rete è organizzata su tre livelli logici distinti:
-
 ### 1. Underlay (Core Fisico - Livello IGP/LDP)
-OSPF (Area 0) fornisce il routing dell'infrastruttura e garantisce la raggiungibilità tra le interfacce Loopback dei nodi Provider. LDP (Label Distribution Protocol) distribuisce le etichette di trasporto MPLS attraverso il core, costruendo il piano di forwarding in base alle rotte apprese da OSPF.
+OSPF (Area 0) fornisce il routing dell'infrastruttura e garantisce la raggiungibilità tra le interfacce Loopback dei nodi Provider. LDP (Label Distribution Protocol) distribuisce le etichette di trasporto MPLS attraverso il core.
 
 ### 2. Overlay (Control Plane VPN - Livello MP-BGP)
-MP-BGP con peering iBGP via Loopback è il protocollo di controllo dell'overlay VPN. Utilizza l'address-family **VPNv4** per annunciare le rotte dei clienti complete di Route Distinguisher (RD) e Label VPN, mantenendo separate le informazioni di routing di ciascun cliente.
+MP-BGP con peering iBGP via Loopback utilizza l'address-family **VPNv4** per annunciare le rotte dei clienti complete di Route Distinguisher (RD) e Label VPN.
 
-### 3. Accesso Cliente (PE-CE - Routing Statico)
-Il routing tra i PE (Provider Edge) e i CE (Customer Edge) è implementato tramite **route statiche per VRF**, ridistribuite poi in MP-BGP. Questa scelta semplifica il laboratorio pur mantenendo la corretta segregazione delle tabelle di routing.
+### 3. Accesso Cliente (PE-CE - Route Statiche)
+I link PE-CE usano subnet /30 dedicate. Il PE ha una route statica verso la LAN del cliente (192.168.10.0/24) con next-hop l'IP del CE sul link /30. La route statica viene redistribuita in MP-BGP.
 
 ---
 
@@ -33,8 +31,6 @@ Il routing tra i PE (Provider Edge) e i CE (Customer Edge) è implementato trami
 |---------|-----|--------------------|--------------------|---------------------|
 | Cliente A | VRF_A | 100:1 | 100:1 | 100:1 |
 | Cliente B | VRF_B | 200:1 | 200:1 | 200:1 |
-
-> **Nota:** RD e RT distinti per ogni cliente garantiscono l'isolamento delle tabelle VPNv4 nel control plane BGP.
 
 ---
 
@@ -52,20 +48,25 @@ Il routing tra i PE (Provider Edge) e i CE (Customer Edge) è implementato trami
 | PE-2 | Loopback0 | 10.200.2.2/32 | Router-ID, iBGP Peering |
 | PE-2 | Ethernet0/0 | 10.100.2.2/30 | Link Underlay verso P-1 |
 
-### Accesso Clienti (VRF)
+### Link PE-CE (subnet /30 dedicate)
 
-| Dispositivo | Interfaccia | IP / Mask | VRF | Sito |
-|-------------|-------------|-----------|-----|------|
-| PE-1 | Ethernet0/1 | 192.168.10.254/24 | VRF_A | Gateway Roma |
-| PE-1 | Ethernet0/2 | 192.168.10.254/24 | VRF_B | Gateway Napoli |
-| PE-2 | Ethernet0/1 | 192.168.10.254/24 | VRF_A | Gateway Milano |
-| PE-2 | Ethernet0/2 | 192.168.10.254/24 | VRF_B | Gateway Torino |
-| CE-A1 | eth0 | 192.168.10.10/24 | — | Cliente A, Roma |
-| CE-A2 | eth0 | 192.168.10.20/24 | — | Cliente A, Milano |
-| CE-B1 | eth0 | 192.168.10.10/24 | — | Cliente B, Napoli |
-| CE-B2 | eth0 | 192.168.10.20/24 | — | Cliente B, Torino |
+| Link | PE Interfaccia | IP PE | IP CE | VRF |
+|------|---------------|-------|-------|-----|
+| PE-1 ↔ CE-A1 | Ethernet0/1 | 10.1.1.1/30 | 10.1.1.2/30 | VRF_A |
+| PE-1 ↔ CE-B1 | Ethernet0/2 | 10.1.2.1/30 | 10.1.2.2/30 | VRF_B |
+| PE-2 ↔ CE-A2 | Ethernet0/1 | 10.1.3.1/30 | 10.1.3.2/30 | VRF_A |
+| PE-2 ↔ CE-B2 | Ethernet0/2 | 10.1.4.1/30 | 10.1.4.2/30 | VRF_B |
 
-> **Overlapping IP intenzionale:** CE-A1 e CE-B1 condividono lo stesso indirizzo IP 192.168.10.10. Questo dimostra che le VRF mantengono tabelle di routing completamente separate, rendendo possibile l'overlap senza conflitti.
+### LAN Clienti (su Ethernet0/1 dei CE)
+
+| CE | Interfaccia LAN | IP LAN | Sito |
+|----|----------------|--------|------|
+| CE-A1 | Ethernet0/1 | 192.168.10.1/24 | Cliente A, Roma |
+| CE-A2 | Ethernet0/1 | 192.168.10.2/24 | Cliente A, Milano |
+| CE-B1 | Ethernet0/1 | 192.168.10.1/24 | Cliente B, Napoli |
+| CE-B2 | Ethernet0/1 | 192.168.10.2/24 | Cliente B, Torino |
+
+> **Overlapping IP intenzionale:** CE-A1 e CE-B1 hanno entrambi 192.168.10.1/24 sulla LAN. Le VRF mantengono tabelle di routing completamente separate — l'overlap non crea conflitti.
 
 ---
 
@@ -75,38 +76,21 @@ Il routing tra i PE (Provider Edge) e i CE (Customer Edge) è implementato trami
 |----|-------------|---|-------------|-------|
 | PE-1 | eth0/0 | P-1 | eth0/0 | Link Underlay SP |
 | PE-2 | eth0/0 | P-1 | eth0/1 | Link Underlay SP |
-| CE-A1 | eth0 | PE-1 | eth0/1 | Accesso VRF_A Sito 1 |
-| CE-B1 | eth0 | PE-1 | eth0/2 | Accesso VRF_B Sito 1 |
-| CE-A2 | eth0 | PE-2 | eth0/1 | Accesso VRF_A Sito 2 |
-| CE-B2 | eth0 | PE-2 | eth0/2 | Accesso VRF_B Sito 2 |
+| CE-A1 | eth0/0 | PE-1 | eth0/1 | Accesso VRF_A Sito 1 |
+| CE-B1 | eth0/0 | PE-1 | eth0/2 | Accesso VRF_B Sito 1 |
+| CE-A2 | eth0/0 | PE-2 | eth0/1 | Accesso VRF_A Sito 2 |
+| CE-B2 | eth0/0 | PE-2 | eth0/2 | Accesso VRF_B Sito 2 |
 
 ---
 
-## Stack Protocollare
+## Route Statiche PE (logica)
 
-```
-┌─────────────────────────────────────────────┐
-│         LIVELLO 3 - PE-CE Routing           │
-│      Route Statiche per VRF → BGP Redist.   │
-├─────────────────────────────────────────────┤
-│         LIVELLO 2 - Overlay VPN             │
-│    MP-BGP iBGP / Address-Family VPNv4       │
-│    Route Distinguisher + VPN Label          │
-├─────────────────────────────────────────────┤
-│         LIVELLO 1 - Underlay Core           │
-│    OSPF Area 0 (IGP) + LDP (Labels)         │
-│    Transport Label per Loopback PE          │
-└─────────────────────────────────────────────┘
-```
-
----
-
-## Obiettivi di Verifica
-
-1. **Connettività Intranet:** `CE-A1 → CE-A2` e `CE-B1 → CE-B2` devono comunicare con successo.
-2. **Isolamento tra VRF:** Un ping da `CE-A1` verso la rete del Cliente B non deve avere esito positivo.
-3. **Overlap IP senza conflitti:** `CE-A1` e `CE-B1` con lo stesso IP devono coesistere su PE-1 senza problemi.
-4. **Verifica Label MPLS:** Un traceroute da `CE-A1` a `CE-A2` deve mostrare le etichette MPLS sul router P-1 (doppia label: Transport + VPN).
+| PE | VRF | Destinazione | Next-Hop | Significato |
+|----|-----|-------------|----------|-------------|
+| PE-1 | VRF_A | 192.168.10.0/24 | 10.1.1.2 | LAN Roma via CE-A1 |
+| PE-1 | VRF_B | 192.168.10.0/24 | 10.1.2.2 | LAN Napoli via CE-B1 |
+| PE-2 | VRF_A | 192.168.10.0/24 | 10.1.3.2 | LAN Milano via CE-A2 |
+| PE-2 | VRF_B | 192.168.10.0/24 | 10.1.4.2 | LAN Torino via CE-B2 |
 
 ---
 
@@ -116,21 +100,24 @@ Il routing tra i PE (Provider Edge) e i CE (Customer Edge) è implementato trami
 |-----|------|-------|------|
 | 2 | Cisco IOL L3 | Provider Edge (PE) | PE-1, PE-2 |
 | 1 | Cisco IOL L3 | Provider Core (P) | P-1 |
-| 4 | VPCS | Customer Edge (Endpoint) | CE-A1, CE-A2, CE-B1, CE-B2 |
+| 4 | Cisco IOL L3 | Customer Edge | CE-A1, CE-A2, CE-B1, CE-B2 |
 
 ---
 
-## Diagramma di Rete
+## Obiettivi di Verifica
 
-![Laboratory Diagram](Diagram.png)
+1. **Connettività Intranet:** `CE-A1 (192.168.10.1) → CE-A2 (192.168.10.2)` e stesso per Cliente B.
+2. **Isolamento tra VRF:** Ping da CE-A1 verso la LAN del Cliente B deve fallire.
+3. **Overlap IP senza conflitti:** CE-A1 e CE-B1 con stessa LAN coesistono su PE-1 senza problemi.
+4. **Verifica Label MPLS:** Traceroute CE-A1 → CE-A2 mostra doppia label MPLS su P-1.
 
 ---
 
-## Concetti Chiave da Padroneggiare
+## Concetti Chiave
 
-- **VRF (Virtual Routing and Forwarding):** Istanze di routing virtuali e isolate su un singolo router fisico.
-- **Route Distinguisher (RD):** Campo a 64 bit che rende univoco un prefisso IPv4 nel piano di controllo BGP VPNv4, anche se sovrapposto con altri clienti.
-- **Route Target (RT):** Community BGP estesa che controlla quali prefissi VPN vengono importati/esportati da una VRF — il meccanismo che realizza l'isolamento o la condivisione selettiva tra VPN.
-- **LDP:** Protocollo di distribuzione delle label di trasporto, strettamente accoppiato con OSPF per costruire il Label Switching Path (LSP) end-to-end tra i PE.
-- **Doppia label MPLS (Label Stack):** Nel core MPLS L3VPN transitano due label: quella esterna (Transport Label, assegnata da LDP) e quella interna (VPN Label, assegnata da MP-BGP). Il router P-1 commuta solo la label esterna, senza dover conoscere le VRF dei clienti.
-- **Penultimate Hop Popping (PHP):** Il router P-1 rimuove la label di trasporto prima di consegnare il pacchetto al PE di destinazione, riducendo il carico di elaborazione sull'egress PE.
+- **VRF:** Istanze di routing virtuali e isolate su un singolo router fisico.
+- **Route Distinguisher (RD):** Rende univoco un prefisso IPv4 nel piano BGP VPNv4.
+- **Route Target (RT):** Controlla import/export tra VRF — il meccanismo dell'isolamento.
+- **LDP:** Distribuisce le Transport Label nel core, accoppiato con OSPF.
+- **Doppia label MPLS:** Label esterna (Transport, LDP) + label interna (VPN, MP-BGP).
+- **PHP:** P-1 rimuove la Transport Label prima di consegnare il pacchetto al PE egress.
