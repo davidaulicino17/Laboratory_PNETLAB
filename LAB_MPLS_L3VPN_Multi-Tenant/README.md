@@ -121,3 +121,8 @@ I link PE-CE usano subnet /30 dedicate. Il PE ha una route statica verso la LAN 
 - **LDP:** Distribuisce le Transport Label nel core, accoppiato con OSPF.
 - **Doppia label MPLS:** Label esterna (Transport, LDP) + label interna (VPN, MP-BGP).
 - **PHP:** P-1 rimuove la Transport Label prima di consegnare il pacchetto al PE egress.
+
+---
+
+### Diagramma di Rete
+![Topology Diagram](Diagram.png)
