@@ -73,4 +73,4 @@ Configurazione delle interfacce VXLAN (VTEP) sugli switch Arista per estendere i
 
 ## Diagramma di Rete
 
-! (Diagram.png)
+![Network Diagram](Diagram.png)
