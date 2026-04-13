@@ -59,3 +59,7 @@ L'infrastruttura è composta da 3 router Cisco vIOS-L3 e 2 host leggeri:
 3.  Applicare la configurazione dell'underlay (OSPF) per garantire la raggiungibilità delle Loopback.
 4.  Applicare la configurazione LISP sui 3 nodi.
 5.  Effettuare un ping da PC-A a PC-B e verificare le associazioni tramite il comando `show ip lisp map-cache` sugli EDGE.
+
+## Network Diagram
+
+![Network Diagram](Diagram.png)
