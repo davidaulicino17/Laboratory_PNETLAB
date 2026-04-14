@@ -1,0 +1,44 @@
+! Configurazione CORE-ISP - AS 65000
+! Ruolo: Provider/Backbone centrale che simula la rete pubblica
+!
+hostname CORE-ISP
+!
+! Ottimizzazione risorse per IOL
+no ip domain lookup
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+!
+interface Loopback0
+ description Router_ID_ISP
+ ip address 1.1.1.1 255.255.255.255
+!
+interface Ethernet0/0
+ description LINK_TO_SITO_A
+ ip address 172.16.10.1 255.255.255.252
+ no shutdown
+!
+interface Ethernet0/1
+ description LINK_TO_SITO_B
+ ip address 172.16.20.1 255.255.255.252
+ no shutdown
+!
+router bgp 65000
+ bgp router-id 1.1.1.1
+ bgp log-neighbor-changes
+ ! Neighbor verso Sito A
+ neighbor 172.16.10.2 remote-as 65100
+ neighbor 172.16.10.2 description PEER_EDGE_A
+ ! Neighbor verso Sito B
+ neighbor 172.16.20.2 remote-as 65200
+ neighbor 172.16.20.2 description PEER_EDGE_B
+ !
+ address-family ipv4
+  neighbor 172.16.10.2 activate
+  ! Invia la rotta di default per permettere l'uscita dei siti senza full routing table
+  neighbor 172.16.10.2 default-originate
+  neighbor 172.16.20.2 activate
+  neighbor 172.16.20.2 default-originate
+ exit-address-family
+!
+end

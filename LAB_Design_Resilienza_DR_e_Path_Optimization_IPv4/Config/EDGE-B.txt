@@ -1,0 +1,54 @@
+! Configurazione EDGE-B - AS 65200
+! Ruolo: Sito di Disaster Recovery
+!
+hostname EDGE-B
+!
+no ip domain lookup
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+!
+interface Loopback0
+ description Router_ID_EDGE_B
+ ip address 3.3.3.3 255.255.255.255
+!
+interface Ethernet0/0
+ description TO_CORE_ISP
+ ip address 172.16.20.2 255.255.255.252
+ no shutdown
+!
+interface Ethernet0/1
+ description TO_DCI_EDGE_A
+ ip address 10.0.0.2 255.255.255.252
+ no shutdown
+!
+interface Ethernet0/2
+ description LAN_ANYCAST_SITO_B
+ ip address 192.168.10.1 255.255.255.0
+ no shutdown
+!
+! Policy per rendere la rotta in ingresso dal CORE meno preferibile
+route-map AS_PREPEND_OUT permit 10
+ set as-path prepend 65200 65200 65200
+!
+! Policy per preferire l'uscita diretta su Internet
+route-map PREFER_LOCAL_ISP permit 10
+ set weight 500
+!
+router bgp 65200
+ bgp router-id 3.3.3.3
+ bgp log-neighbor-changes
+ neighbor 172.16.20.1 remote-as 65000
+ neighbor 172.16.20.1 description PEER_ISP
+ neighbor 10.0.0.1 remote-as 65100
+ neighbor 10.0.0.1 description PEER_DCI_EDGE_A
+ !
+ address-family ipv4
+  network 192.168.10.0 mask 255.255.255.0
+  neighbor 172.16.20.1 activate
+  neighbor 172.16.20.1 route-map PREFER_LOCAL_ISP in
+  neighbor 172.16.20.1 route-map AS_PREPEND_OUT out
+  neighbor 10.0.0.1 activate
+ exit-address-family
+!
+end

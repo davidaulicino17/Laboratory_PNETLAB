@@ -1,0 +1,28 @@
+! Configurazione SW-LAN-A
+! Ruolo: Switch L2 Accesso Sito A
+!
+hostname SW-LAN-A
+!
+no ip domain-lookup
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+!
+vlan 10
+ name SITO_A_LAN
+!
+interface Ethernet0/0
+ description TO_EDGE_A
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast edge
+ no shutdown
+!
+interface Ethernet0/1
+ description TO_PC_A
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast edge
+ no shutdown
+!
+end
