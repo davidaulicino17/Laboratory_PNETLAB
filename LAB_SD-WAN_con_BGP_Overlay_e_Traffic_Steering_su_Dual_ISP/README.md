@@ -50,35 +50,4 @@ Simulare un'architettura Enterprise Site-to-Site (Main e Branch) utilizzando due
 
 ## Network Diagram
 
-graph TD
-    subgraph Sede_Main ["Site: Main (AS 65001)"]
-        LAN_M["PC-Main\n10.10.10.10"] --- FGT_M["FGT-Main\nSD-WAN Edge"]
-        FGT_M -.- Mgmt_M(("Mgmt OOB\nVRF 1"))
-    end
-
-    subgraph Internet ["Internet (IOL Router)"]
-        ISP["IOL-Internet\n(Simula Cloud Pubblico)\nLo0: 8.8.8.8"]
-    end
-
-    subgraph Sede_Branch ["Site: Branch (AS 65002)"]
-        FGT_B["FGT-Branch\nSD-WAN Edge"] --- LAN_B["PC-Branch\n10.20.20.10"]
-        FGT_B -.- Mgmt_B(("Mgmt OOB\nVRF 1"))
-    end
-
-    FGT_M -- "port1 (ISP1: 192.0.2.x)" --> ISP
-    FGT_M -- "port2 (ISP2: 198.51.100.x)" --> ISP
-    
-    ISP -- "e1/0 (ISP1: 203.0.113.x)" --> FGT_B
-    ISP -- "e1/1 (ISP2: 100.64.0.x)" --> FGT_B
-
-    %% Overlay Tunnels
-    FGT_M -. "IPsec tun-isp1 (172.16.1.x) BGP" .- FGT_B
-    FGT_M -. "IPsec tun-isp2 (172.16.2.x) BGP" .- FGT_B
-
-    classDef main fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
-    classDef branch fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
-    classDef internet fill:#fff3e0,stroke:#e65100,stroke-width:2px;
-    
-    class Sede_Main main;
-    class Sede_Branch branch;
-    class Internet internet;
+![Network Diagram](Diagram.png)
