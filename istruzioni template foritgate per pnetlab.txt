@@ -1,0 +1,5 @@
+inseriscilo in:
+/opt/unetlab/html/templates/intel/
+/opt/unetlab/html/templates/amd/
+
+a seconda del processore
